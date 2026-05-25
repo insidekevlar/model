@@ -600,14 +600,34 @@
         if (errDetails) {
           errDetails.style.display = 'block';
           
-          let detailsMsg = '';
+          let detailsMsg = 'Error Details:\n';
           if (error) {
-            detailsMsg += error.message || error.toString();
-            if (error.stack) {
-              detailsMsg += '\n\nStack:\n' + error.stack;
+            if (typeof error === 'string') {
+              detailsMsg += error;
+            } else {
+              if (error.name) detailsMsg += `Name: ${error.name}\n`;
+              if (error.message) detailsMsg += `Message: ${error.message}\n`;
+              if (error.stack) detailsMsg += `Stack: ${error.stack}\n`;
+              if (error.type) detailsMsg += `Event Type: ${error.type}\n`;
+              
+              if (error.target) {
+                detailsMsg += `Target: ${error.target.constructor.name}\n`;
+                if (error.target.src) detailsMsg += `Source: ${error.target.src}\n`;
+                if (error.target.status) detailsMsg += `HTTP Status: ${error.target.status} ${error.target.statusText || ''}\n`;
+                if (error.target.responseURL) detailsMsg += `Response URL: ${error.target.responseURL}\n`;
+              }
+              
+              try {
+                const serialized = JSON.stringify(error, Object.getOwnPropertyNames(error), 2);
+                if (serialized && serialized !== '{}') {
+                  detailsMsg += `\nFull Dump:\n${serialized}`;
+                }
+              } catch (e) {
+                detailsMsg += `\n(Serialization failed: ${e.message})`;
+              }
             }
           } else {
-            detailsMsg = 'An unknown error occurred while loading the model.';
+            detailsMsg += 'An unknown error occurred while loading the model.';
           }
           errDetails.textContent = detailsMsg;
         }
