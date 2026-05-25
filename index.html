@@ -484,6 +484,7 @@
     scene.add(new THREE.Mesh(envGeo, envMat));
 
     // --- Load model ---
+    const dracoLoader = new DRACOLoader();
     dracoLoader.setDecoderPath('https://www.gstatic.com/draco/versioned/decoders/1.5.7/');
 
     const loader = new GLTFLoader();
