@@ -101,6 +101,24 @@
       background-clip: text;
     }
 
+    .error-details {
+      margin-top: 20px;
+      padding: 12px 18px;
+      background: rgba(252, 92, 138, 0.1);
+      border: 1px solid rgba(252, 92, 138, 0.3);
+      border-radius: 8px;
+      color: #fc5c8a;
+      font-family: monospace;
+      font-size: 11px;
+      max-width: 80%;
+      word-break: break-all;
+      white-space: pre-wrap;
+      text-align: left;
+      display: none;
+      max-height: 200px;
+      overflow-y: auto;
+    }
+
     /* Top bar */
     #top-bar {
       position: fixed;
@@ -307,6 +325,7 @@
     <div class="loader-ring"></div>
     <div class="loading-text">Loading model</div>
     <div class="loading-progress" id="loading-progress">0%</div>
+    <div class="error-details" id="error-details"></div>
   </div>
 
   <!-- Top bar -->
@@ -564,8 +583,34 @@
       },
       (error) => {
         console.error('Error loading model:', error);
-        progressEl.textContent = 'Error!';
-        document.querySelector('.loading-text').textContent = 'Failed to load model';
+        
+        // Stop spinning and hide loader ring
+        const ring = document.querySelector('.loader-ring');
+        if (ring) ring.style.display = 'none';
+
+        progressEl.textContent = '❌';
+        
+        const loaderText = document.querySelector('.loading-text');
+        if (loaderText) {
+          loaderText.textContent = 'Failed to load model';
+          loaderText.style.color = '#fc5c8a';
+        }
+
+        const errDetails = document.getElementById('error-details');
+        if (errDetails) {
+          errDetails.style.display = 'block';
+          
+          let detailsMsg = '';
+          if (error) {
+            detailsMsg += error.message || error.toString();
+            if (error.stack) {
+              detailsMsg += '\n\nStack:\n' + error.stack;
+            }
+          } else {
+            detailsMsg = 'An unknown error occurred while loading the model.';
+          }
+          errDetails.textContent = detailsMsg;
+        }
       }
     );
 
